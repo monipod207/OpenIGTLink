@@ -18,7 +18,8 @@
 #include "igtlOSUtil.h"
 #include "igtlPointMessage.h"
 #include "igtlClientSocket.h"
-
+#include "igtlMessageHeader.h"
+#include "igtlServerSocket.h"
 
 int main(int argc, char* argv[])
 {
@@ -100,7 +101,22 @@ int main(int argc, char* argv[])
   //------------------------------------------------------------
   // Send
   socket->Send(pointMsg->GetPackPointer(), pointMsg->GetPackSize());
-  
+       while(1)
+	{
+	igtl::MessageHeader::Pointer headerMsg;
+  	headerMsg = igtl::MessageHeader::New();
+	headerMsg->InitPack();
+ 	headerMsg->Unpack();
+	bool timeout(false);
+        socket->Receive(headerMsg->GetPosition(), timeout);        // Get time stamp
+        igtlUint32 sec;
+        igtlUint32 nanosec;
+        
+        headerMsg->GetTimeStamp(ts);
+	std::cerr << " Name      : " << headerMsg->GetPosition() << std::endl;
+	ReceivePoint(socket, headerMsg);
+	
+	}
   
   //------------------------------------------------------------
   // Close the socket

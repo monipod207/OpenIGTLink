@@ -11,6 +11,7 @@ ENDIF(COMMAND cmake_policy)
 set (CMAKE_CXX_STANDARD 11)
 #-----------------------------------------------------------------------------
 # OpenIGTlink version number.
+#test
 SET(OpenIGTLink_VERSION_MAJOR "3")
 SET(OpenIGTLink_VERSION_MINOR "1")
 SET(OpenIGTLink_VERSION_PATCH "0")

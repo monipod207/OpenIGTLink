@@ -1,16 +1,3 @@
-/*=========================================================================
-
-  Program:   OpenIGTLink -- Example for Data Receiving Server Program
-  Language:  C++
-
-  Copyright (c) Insight Software Consortium. All rights reserved.
-
-  This software is distributed WITHOUT ANY WARRANTY; without even
-  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-  PURPOSE.  See the above copyright notices for more information.
-
-=========================================================================*/
-
 #include <iostream>
 #include <iomanip>
 #include <math.h>
@@ -145,7 +132,11 @@ int main(int argc, char* argv[])
 #if OpenIGTLink_PROTOCOL_VERSION >= 2
         else if (strcmp(headerMsg->GetDeviceType(), "POINT") == 0)
           {
-          ReceivePoint(socket, headerMsg);
+           int a = ReceivePoint(socket, headerMsg);
+           if (a == 0) 
+           {
+               return 0;
+           }
           }
         else if (strcmp(headerMsg->GetDeviceType(), "TRAJ") == 0)
           {
@@ -383,10 +374,32 @@ int ReceivePoint(igtl::Socket * socket, igtl::MessageHeader * header)
       std::cerr << " Radius    : " << std::fixed << pointElement->GetRadius() << std::endl;
       std::cerr << " Owner     : " << pointElement->GetOwner() << std::endl;
       std::cerr << "================================" << std::endl;
-      }
-    }
 
-  return 1;
+      pointElement->SetPosition(-pos[0], -pos[1], -pos[2]);
+
+
+      igtl::PointMessage::Pointer pointMsg2;
+      pointMsg2 = igtl::PointMessage::New();
+      pointMsg2->SetDeviceName("PointSender");
+
+      //---------------------------
+       // Pack into the point message
+      pointMsg2->AddPointElement(pointElement);
+
+      pointMsg2->Pack();
+
+      //------------------------------------------------------------
+      // Send
+      socket->Send(pointMsg2->GetPackPointer(), pointMsg2->GetPackSize());
+      }
+    return 0;
+    }
+  else 
+  {
+
+      return 1;
+  }
+
 }
 
 int ReceiveTrajectory(igtl::Socket * socket, igtl::MessageHeader::Pointer& header)
